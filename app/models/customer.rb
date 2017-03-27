@@ -12,13 +12,20 @@ class Customer
   attr_accessor(*self.public_attributes)
   attr_reader :id
 
+  # returns all of the reviews written by that customer
   def reviews
+    sql = <<-SQL
+      SELECT * FROM reviews
+      WHERE id = ?
+    SQL
+
+    self.class.db.execute(sql, self.reviews_id)
   end
 
   def restaurants
     sql = <<-SQL
-      SELECT restaurants.* FROM restaurants
-      INNER JOIN reviews ON reviews.restaurant_id = restaurants.id
+      SELECT * FROM restaurants INNER JOIN reviews
+      ON reviews.restaurant_id = restaurants.id
       WHERE reviews.customer_id = ?
     SQL
     self.class.db.execute(sql, self.id)
